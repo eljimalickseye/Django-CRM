@@ -8,21 +8,21 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">se deconnecter</a>
-                </li>
                 <!-- <li class="nav-item">
                     <a class="nav-link" href="{% url 'update_details' %}">Ajouter utilisateur</a>
                 </li> -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'insert' %}">Ajouter Fichier</a>
+                    <a class="nav-link" href="{% url 'insert' %}">Importer liste d'utilisateurs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Nouvel utilisateur</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Déconnexion sécurisée</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">s'incrire</a>
-                </li
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">se connecter</a>
+                    <a class="nav-link" href="{% url 'home' %}">Connexion sécurisée</a>
                 </li>
                 {% endif %}
             </ul>

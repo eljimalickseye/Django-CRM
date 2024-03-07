@@ -10,7 +10,6 @@ urlpatterns = [
     path('add_record/', views.add_record, name='add_record'),
     path('update_record/<int:pk>', views.update_record, name='update_record'),
     path('update_details/', views.update_details, name='update_details'),
-    path('extract/', views.extract_data, name='extract_data'),
     path('', views.RecordListView, name='record-list'),
     path('export/', views.export_to_csv, name='export_to_csv'),
     path('export_actif/', views.export_actif, name='export_actif'),

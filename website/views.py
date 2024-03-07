@@ -224,24 +224,6 @@ def update_details(request):
     return render(request, 'update_details.html', {'form': form, 'message': message})
 
 
-def extract_data(request):
-    if request.method == 'POST':
-        form = FilterForm(request.POST)
-        if form.is_valid():
-            filter_choice = form.cleaned_data['filter_choice']
-            if filter_choice == 'GNOC':
-                extracted_data = Record.objects.filter(category='Category1')
-            elif filter_choice == 'DESC':
-                extracted_data = Record.objects.filter(category='Category2')
-            # Ajoutez d'autres conditions pour d'autres filtres au besoin
-            else:
-                extracted_data = None  # Aucun filtre sélectionné
-
-            return render(request, 'results.html', {'data': extracted_data})
-    else:
-        form = FilterForm()
-    return render(request, 'extract_data.html', {'form': form})
-
 
 def export_to_csv(request):
     response = HttpResponse(content_type='text/csv')
@@ -468,5 +450,5 @@ def insert(request):
             return redirect('home')
     else:
         form = UploadCSVForm()
-    return render(request, 'test.html', {'form': form})
+    return render(request, 'AddFile.html', {'form': form})
 
