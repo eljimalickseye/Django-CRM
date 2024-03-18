@@ -1,6 +1,6 @@
 <style>
     .exit {
-        color: rgb(237, 90, 90);
+        color: rgb(254, 254, 254);
     }
 </style>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -26,15 +26,12 @@
                 <a class="nav-link" href="{% url 'temporaire_drh' %}">
                     Liste DRH
                 </a>
+        
 
-                <a class="nav-link" href="{% url 'insert' %}">
-                    fff
+                <a class="nav-link" href="#" onclick="return confirm('Es-tu sûr de vouloir supprimer toutes les données ?') ? window.location.href='{% url 'supprimer_toutes_donnees' %}' : false;">
+                    Supprimer les données
                 </a>
-                
 
-                <a class="nav-link" href="{% url 'supprimer_toutes_donnees' %}">
-                    Delete ALL FILES
-                </a>
                 <li class="nav-item">
                     <a class="nav-link exit" href="{% url 'logout' %}">Déconnexion sécurisée</a>
                 </li>

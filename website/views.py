@@ -407,27 +407,40 @@ def export_tmp(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="records_tmp.csv"'
 
-    # Récupérer les enregistrements à supprimer depuis la base de données
-    records_tmp = Record.objects.filter(last_connected__lt=timezone.now() - timedelta(days=30))   # Adapter selon votre modèle et intervalle de temps
-
+    # Récupérer les enregistrements à supprimer depuis la base de données SQL
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT id, username, last_connected, commentaire FROM website_record WHERE (LOWER(username) LIKE 'tmp%' OR  LOWER(username) LIKE 'ext%' OR LOWER(username) LIKE 'stg%' OR LOWER(username) LIKE 'Int%') AND last_connected > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
-        records = cursor.fetchall()
+            "SELECT id, username, last_connected, commentaire FROM website_record WHERE (LOWER(username) LIKE 'tmp%' OR  LOWER(username) LIKE 'ext%' OR LOWER(username) LIKE 'stg%' OR LOWER(username) LIKE 'Int%') AND last_connected > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"
+        )
+        records_sql = cursor.fetchall()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="records_tmp.csv"'
+    # Récupérer les enregistrements à supprimer depuis la base de données Django
+    records_tmp = Record.objects.filter(
+        last_connected__gte=timezone.now() - timedelta(days=30),
+        username__istartswith="tmp",
+    ).filter(
+        username__istartswith="ext"
+    ).filter(
+        username__istartswith="INT"
+    )
 
+    # Créer un dictionnaire pour stocker les enregistrements avec l'identifiant comme clé
+    records_dict = {}
+
+    # Ajouter les enregistrements SQL dans le dictionnaire
+    for record_sql in records_sql:
+        records_dict[record_sql[0]] = record_sql
+
+    # Ajouter les enregistrements Django dans le dictionnaire en évitant les doublons
+    for record_tmp in records_tmp:
+        if record_tmp.id not in records_dict:
+            records_dict[record_tmp.id] = [record_tmp.id, record_tmp.username, record_tmp.last_connected, record_tmp.commentaire]
+
+    # Écrire les enregistrements dans le fichier CSV
     writer = csv.writer(response, delimiter=",")
-    writer.writerow(['ID', 'Username', 'Last Connected Date', 'Commentaire'])
-    
-    # Écrire les enregistrements obtenus à partir de la requête SQL
-    for record in records:
+    writer.writerow(['ID', 'Username', 'Last Date Connected', 'Commentaire'])
+    for record in records_dict.values():
         writer.writerow(record)
-
-    # Écrire les enregistrements obtenus à partir de la requête Django
-    for record in records_tmp:
-        writer.writerow([record.id, record.username, record.last_connected, record.commentaire])
 
     return response
 
@@ -436,8 +449,28 @@ def export_to_desk(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="records_desc.csv"'
 
-    # Récupérer les enregistrements à supprimer depuis la base de données Django
-    records_to_delete = Record.objects.filter(last_connected__lt=timezone.now() - timedelta(days=30))  # Adapter selon le modèle
+    records_to_delete = Record.objects.filter(
+        last_connected__lt=timezone.now() - timedelta(days=30),
+       username__istartswith="pcci",
+    ).filter(
+        username__istartswith="stl"
+    ).filter(
+        username__istartswith="1431"
+    ).filter(
+        username__istartswith="1413"
+    ).filter(
+        username__istartswith="ksv"
+    ).filter(
+        username__istartswith="w2c"
+    ).filter(
+        username__istartswith="pop_"
+    ).filter(
+        username__istartswith="pdist"
+    ).filter(
+        username__istartswith="sitel"
+    ).filter(
+        username__istartswith="psup"
+    )
 
     with connection.cursor() as cursor:
         cursor.execute(
@@ -462,8 +495,6 @@ def export_to_desk(request):
         writer.writerow(record)
 
     return response
-
-
 
 
 def inserer_donnees(connection, donnees_csv):
@@ -501,7 +532,6 @@ def inserer_donnees(connection, donnees_csv):
     finally:
         cursor.close()
         connection.close()
-
 
 
 def insert(request):
@@ -671,9 +701,8 @@ def update_status(request):
 
 
 def insert_admp(request):
-
     if request.method == 'POST' and request.FILES.get('csv_file'):
-        form = UploadCSVForm(request.POST, request.FILES)
+        form = UploadADForm(request.POST, request.FILES)
         if form.is_valid():
             csv_file = request.FILES['csv_file']
             decoded_file = csv_file.read().decode('utf-8')
@@ -704,7 +733,7 @@ def insert_admp(request):
             return redirect('adfile')
     else:
         form = UploadADForm()
-    return render(request, 'adfile.html', {'form': form})
+    return render(request, 'AddFileAD.html', {'form': form})
 
 
 def export_status_desabled(request):
@@ -973,7 +1002,6 @@ def inserer_data_tmp_drh(connection, donnees_csv):
         connection.close()
 
 
-
 def insert_tmp_drh(request):
     if request.method == 'POST' and request.FILES.get('csv_file'):
         form = UploadTmpDRHForm(request.POST, request.FILES)
@@ -1008,7 +1036,6 @@ def insert_tmp_drh(request):
     else:
         form = UploadTmpDRHForm()
     return render(request, 'adtemporairefile.html', {'form': form})
-
 
 
 from datetime import date

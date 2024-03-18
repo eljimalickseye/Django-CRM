@@ -21,25 +21,28 @@
         font-size: 13px;
     }
 
-    .add{
-        font-size: 35px;
-        color: black;
-        border: 0px black solid;
-        border-radius:100% ;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color:rgb(172, 237, 172) ;
-    }
+    .btn-custom {
+    background-color: #080808;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    text-size-adjust: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #a9c6e4;
+}
 </style>
 <div class="container mt-5">
     <div class="d-flex justify-content-between mb-5">
         <h2>Liste Temporaire DRH</h2>
         
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            +
+        <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Add+
         </button>
      
     </div>
@@ -93,7 +96,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="container mt-5">
+           
                 <form method="POST" enctype="multipart/form-data" action="{% url 'insert_tmp_drh'%}">
                     {% csrf_token %}
                     <input type="file" name="csv_file" accept=".csv" required>
@@ -113,13 +116,6 @@
                 </div>
                 <div class="item_pos">
                     <div>
-                        <a class="nav-link" href="{% url 'temporaire_drh' %}">
-                            <button type="submit" class="btn btn-secondary">
-                                Retourner
-                            </button>
-                        </a>
-                    </div>
-                    <div>
                         <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats fichier</button>
                     </div>
                 </div>
@@ -130,10 +126,10 @@
                     }
                 </script>
             </div>
-        </div>
+       
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-          <button type="button" class="btn btn-primary">Enregistrer</button>
+          <!-- <button type="button" class="btn btn-primary">Enregistrer</button> -->
         </div>
       </div>
     </div>

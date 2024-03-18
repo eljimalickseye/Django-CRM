@@ -21,14 +21,30 @@
         font-size: 13px;
     }
 
+    .btn-custom {
+    background-color: #080808;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    text-size-adjust: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #a9c6e4;
+}
+
 
 </style>
 <div class="container mt-5">
     <div class="d-flex justify-content-between mb-5">
         <h2>Full AD Accounts</h2>
         
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-           +
+        <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
+           Add+
         </button>
      
     </div>
@@ -84,8 +100,8 @@
         </div>
         <div class="modal-body">
            <!-- Upload de fichier AD -->
-            <div class="container mt-5">
-                <form method="POST" enctype="multipart/form-data action={% url 'insert_admp' %}">
+            
+                <form method="POST" enctype="multipart/form-data" action="{% url 'insert_admp' %}">
                     {% csrf_token %}
                     <input type="file" name="csv_file" accept=".csv" required>
                     <button type="submit" class="btn btn-primary">Upload</button>
@@ -105,9 +121,6 @@
                     <p>status</p>
                 </div>
                 <div class="item_pos">
-                    <div><a class="nav-link" href="{% url 'adfile' %}"><button type="submit"
-                            class="btn btn-secondary">Retourner</button></a>
-                    </div>
                     <div>
                         <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats fichier</button>
                     </div>
@@ -119,30 +132,14 @@
                     }
                 </script>
             </div>
-        </div>
+       
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-          <button type="button" class="btn btn-primary">Enregistrer</button>
+          <!-- <button type="button" class="btn btn-primary">Enregistrer</button> -->
         </div>
       </div>
     </div>
   </div>
-  
-
-{% else %}
-<div class="container mt-5 col-md-6 offset-md-3">
-<h1>Login</h1>
-<br />
-<form action="{% url 'status' %}" method="POST" class="mt-3">
-    {% csrf_token %}
-    <div class="mb-3">
-        <input type="text" class="form-control" name="username" placeholder="Username" required>
-    </div>
-    <div class="mb-3">
-        <input type="password" class="form-control" name="password" placeholder="Password" required>
-    </div>
-    <button type="submit" class="btn btn-size btn-primary ">Login</button>
-</form>
 </div>
 {% endif %}
 {% endblock %}
