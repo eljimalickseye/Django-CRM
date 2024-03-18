@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between mb-5">
+    <h1>Updated Status Records</h1>
+
+    <table id="data_table" class="table table-striped table-bordered table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in updated_status_records %}
+            <tr>
+                <td>{{ record.username }}</td>
+                <td>{{ record.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+<input class="btn btn-primary" id="refreshButton" type="reset" value="Reset">
+<script>
+    document.getElementById("refreshButton").addEventListener("click", function() {
+        window.location.reload(); // Recharge la page
+        // Ou utilisez une requête AJAX pour récupérer les données et mettre à jour la vue sans recharger la page entière
+    });
+</script>
+{% endif %}
+{% endblock %}
+

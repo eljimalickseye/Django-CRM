@@ -83,3 +83,12 @@ class FilterForm(forms.Form):
 
 class UploadCSVForm(forms.Form):
     csv_file = forms.FileField(label='Ajouter +')
+
+class UploadStatusForm(forms.Form):
+    csv_file = forms.FileField(label='Ajouter +')
+
+class UploadADForm(forms.Form):
+    csv_file = forms.FileField(label='Ajouter +')
+
+class UploadTmpDRHForm(forms.Form):
+    csv_file = forms.FileField(label='Ajouter +')

@@ -2,14 +2,16 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Upload CSV File</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <h1>Upload AD File</h1>
+    <form method="POST" enctype="multipart/form-data action={% url ''%}">
         {% csrf_token %}
         <input type="file" name="csv_file" accept=".csv" required>
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
     <style>
-        .item_pos{
+        /* Styles pour cacher l'élément par défaut */
+
+        .item_pos {
             display: flex;
             flex-direction: row;
             column-gap: 10px;
@@ -18,18 +20,11 @@
     <div id="show"  style="display: none;">
         <h3>Format fichier</h3>
         <p>username</p>
-        <p>first_name</p>
-        <p>last_name</p>
-        <p>last_connected</p>
-        <p>commentaire</p>
+        <p>status</p>
     </div>
     <div class="item_pos">
-        <div>
-            <a class="nav-link" href="{% url 'home' %}">
-                <button type="submit" class="btn btn-secondary">
-                    Retourner
-                </button>
-            </a>
+        <div><a class="nav-link" href="{% url 'adfile' %}"><button type="submit"
+                class="btn btn-secondary">Retourner</button></a>
         </div>
         <div>
             <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats fichier</button>

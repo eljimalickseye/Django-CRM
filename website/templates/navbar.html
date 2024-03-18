@@ -1,3 +1,8 @@
+<style>
+    .exit {
+        color: rgb(237, 90, 90);
+    }
+</style>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'home' %}">Fiabilisation</a>
@@ -12,17 +17,33 @@
                     <a class="nav-link" href="{% url 'update_details' %}">Ajouter utilisateur</a>
                 </li> -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'insert' %}">Importer liste d'utilisateurs</a>
+                    <a class="nav-link" href="{% url 'status' %}">Status Fiabilisation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Nouvel utilisateur</a>
+                    <a class="nav-link" href="{% url 'adfile' %}">Full Account AD </a>
                 </li>
+
+                <a class="nav-link" href="{% url 'temporaire_drh' %}">
+                    Liste DRH
+                </a>
+
+                <a class="nav-link" href="{% url 'insert' %}">
+                    fff
+                </a>
+                
+
+                <a class="nav-link" href="{% url 'supprimer_toutes_donnees' %}">
+                    Delete ALL FILES
+                </a>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Déconnexion sécurisée</a>
+                    <a class="nav-link exit" href="{% url 'logout' %}">Déconnexion sécurisée</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Connexion sécurisée</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Nouvel utilisateur</a>
                 </li>
                 {% endif %}
             </ul>

@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Upload CSV File</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <h1>Upload fichier des temporaires de la DRH</h1>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'insert_tmp_drh'%}">
         {% csrf_token %}
         <input type="file" name="csv_file" accept=".csv" required>
         <button type="submit" class="btn btn-primary">Upload</button>
@@ -18,14 +18,11 @@
     <div id="show"  style="display: none;">
         <h3>Format fichier</h3>
         <p>username</p>
-        <p>first_name</p>
-        <p>last_name</p>
-        <p>last_connected</p>
-        <p>commentaire</p>
+        <p>date_end</p>
     </div>
     <div class="item_pos">
         <div>
-            <a class="nav-link" href="{% url 'home' %}">
+            <a class="nav-link" href="{% url 'temporaire_drh' %}">
                 <button type="submit" class="btn btn-secondary">
                     Retourner
                 </button>
