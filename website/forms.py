@@ -23,10 +23,7 @@ class SignUpForm(UserCreationForm):
         self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['username'].widget.attrs['placeholder'] = 'User Name'
         self.fields['username'].label = ''
-        self.fields['username'].help_text = '<span class="form-text \
-        text-muted"><small>Required. 150 characters or \ \
-        fewer. Letters, digits and @/./+/-/\ \
-        _ only.</small></span>'
+        self.fields['username'].help_text = '<span class="form-text text-muted"><small>Required. 150 characters or fewer. Letters, digits and  only.</small></span>'
 
         self.fields['password1'].widget.attrs['class'] = 'form-control'
         self.fields['password1'].widget.attrs['placeholder'] = 'Password'
@@ -41,9 +38,7 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm \
         Password'
         self.fields['password2'].label = ''
-        self.fields['password2'].help_text = '<span class="form-text \
-        text-muted"><small>Enter the same password as before, for verification.\
-        </small></span>'
+        self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
 
 
 # Create Add Record Form
@@ -82,13 +77,13 @@ class FilterForm(forms.Form):
 
 
 class UploadCSVForm(forms.Form):
-    csv_file = forms.FileField(label='Ajouter +')
+    file = forms.FileField(label='Ajouter +')
 
 class UploadStatusForm(forms.Form):
-    csv_file = forms.FileField(label='Ajouter +')
+    file = forms.FileField(label='Ajouter +')
 
 class UploadADForm(forms.Form):
-    csv_file = forms.FileField(label='Ajouter +')
+    file = forms.FileField(label='Ajouter +')
 
 class UploadTmpDRHForm(forms.Form):
-    csv_file = forms.FileField(label='Ajouter +')
+    file = forms.FileField(label='Ajouter +')

@@ -13,7 +13,6 @@ import csv
 from django.db import connection
 import mysql.connector
 import pandas as pd
-import csv
 from io import TextIOWrapper
 from .forms import UploadCSVForm,UploadStatusForm,UploadADForm
 from io import StringIO
@@ -21,6 +20,7 @@ from dateutil.relativedelta import relativedelta
 import re
 from django.utils import timezone
 from dateutil import parser
+from datetime import date
 
 def home(request):
     now = datetime.now().date()
@@ -535,18 +535,28 @@ def inserer_donnees(connection, donnees_csv):
 
 
 def insert(request):
-    if request.method == 'POST' and request.FILES.get('csv_file'):
+    if request.method == 'POST' and request.FILES.get('file'):
         form = UploadCSVForm(request.POST, request.FILES)
         if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            decoded_file = csv_file.read().decode('utf-8')
+            file = request.FILES['file']
+            # Vérifier si le fichier est un fichier Excel ou CSV
+            if file.name.endswith('.xls') or file.name.endswith('.xlsx'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier Excel
+                    donnees = pd.read_excel(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier Excel : {}".format(e))
+            elif file.name.endswith('.csv'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier CSV
+                    donnees = pd.read_csv(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier CSV : {}".format(e))
+            else:
+                return HttpResponse("Le fichier doit être au format Excel ou CSV.")
             
+            # Connexion à la base de données MySQL
             try:
-                # Convertir le contenu décodé en un objet StringIO
-                csv_data = StringIO(decoded_file)
-                # Utiliser pandas pour lire les données CSV
-                donnees_csv = pd.read_csv(csv_data)
-                
                 connection = mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -555,7 +565,7 @@ def insert(request):
                 )
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
-                    inserer_donnees(connection, donnees_csv)
+                    inserer_donnees(connection, donnees)
                     connection.close()
                     print("Connexion à la base de données MySQL fermée.")
             except mysql.connector.Error as e:
@@ -608,18 +618,28 @@ def inserer_status_data(connection, donnees_csv):
 
 
 def insert_status(request):
-    if request.method == 'POST' and request.FILES.get('csv_file'):
-        form = UploadCSVForm(request.POST, request.FILES)
+    if request.method == 'POST' and request.FILES.get('file'):
+        form = UploadStatusForm(request.POST, request.FILES)
         if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            decoded_file = csv_file.read().decode('utf-8')
+            file = request.FILES['file']
+            # Vérifier si le fichier est un fichier Excel ou CSV
+            if file.name.endswith('.xls') or file.name.endswith('.xlsx'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier Excel
+                    donnees = pd.read_excel(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier Excel : {}".format(e))
+            elif file.name.endswith('.csv'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier CSV
+                    donnees = pd.read_csv(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier CSV : {}".format(e))
+            else:
+                return HttpResponse("Le fichier doit être au format Excel ou CSV.")
             
+            # Connexion à la base de données MySQL
             try:
-                # Convertir le contenu décodé en un objet StringIO
-                csv_data = StringIO(decoded_file)
-                # Utiliser pandas pour lire les données CSV
-                donnees_csv = pd.read_csv(csv_data)
-                
                 connection = mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -628,7 +648,7 @@ def insert_status(request):
                 )
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
-                    inserer_status_data(connection, donnees_csv)
+                    inserer_status_data(connection, donnees)
                     connection.close()
                     print("Connexion à la base de données MySQL fermée.")
             except mysql.connector.Error as e:
@@ -643,10 +663,10 @@ def insert_status(request):
     return render(request, 'AddFileStatus.html', {'form': form})
 
 
-def inserer_admp_data(connection, donnees_csv):
+def inserer_admp_data(connection, donnees):
     cursor = connection.cursor()
     try:
-        for index, row in donnees_csv.iterrows():
+        for index, row in donnees.iterrows():
             # Insérer les données de base
             cursor.execute("INSERT INTO  website_admpreport (created_at, username, status) VALUES (%s, %s, %s)",
                            (timezone.now(), row['username'], row['status']))
@@ -701,18 +721,28 @@ def update_status(request):
 
 
 def insert_admp(request):
-    if request.method == 'POST' and request.FILES.get('csv_file'):
+    if request.method == 'POST' and request.FILES.get('file'):
         form = UploadADForm(request.POST, request.FILES)
         if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            decoded_file = csv_file.read().decode('utf-8')
+            file = request.FILES['file']
+            # Vérifier si le fichier est un fichier Excel ou CSV
+            if file.name.endswith('.xls') or file.name.endswith('.xlsx'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier Excel
+                    donnees = pd.read_excel(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier Excel : {}".format(e))
+            elif file.name.endswith('.csv'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier CSV
+                    donnees = pd.read_csv(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier CSV : {}".format(e))
+            else:
+                return HttpResponse("Le fichier doit être au format Excel ou CSV.")
             
+            # Connexion à la base de données MySQL
             try:
-                # Convertir le contenu décodé en un objet StringIO
-                csv_data = StringIO(decoded_file)
-                # Utiliser pandas pour lire les données CSV
-                donnees_csv = pd.read_csv(csv_data)
-                
                 connection = mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -721,7 +751,7 @@ def insert_admp(request):
                 )
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
-                    inserer_admp_data(connection, donnees_csv)
+                    inserer_admp_data(connection, donnees)
                     connection.close()
                     print("Connexion à la base de données MySQL fermée.")
             except mysql.connector.Error as e:
@@ -730,6 +760,7 @@ def insert_admp(request):
             except Exception as e:
                 print("Une erreur s'est produite lors de l'insertion des données dans la base de données MySQL :", e)
                 return HttpResponse("Une erreur s'est produite lors de l'insertion des données dans la base de données MySQL")
+            
             return redirect('adfile')
     else:
         form = UploadADForm()
@@ -970,7 +1001,6 @@ def temporaire_drh(request):
     return render(request, 'TemporaireDRH.html', {**context, 'tmp_records': tmp_records})
 
 
-
 def inserer_data_tmp_drh(connection, donnees_csv):
     cursor = connection.cursor()
     try:
@@ -1003,18 +1033,28 @@ def inserer_data_tmp_drh(connection, donnees_csv):
 
 
 def insert_tmp_drh(request):
-    if request.method == 'POST' and request.FILES.get('csv_file'):
+    if request.method == 'POST' and request.FILES.get('file'):
         form = UploadTmpDRHForm(request.POST, request.FILES)
         if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            decoded_file = csv_file.read().decode('utf-8')
+            file = request.FILES['file']
+            # Vérifier si le fichier est un fichier Excel ou CSV
+            if file.name.endswith('.xls') or file.name.endswith('.xlsx'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier Excel
+                    donnees = pd.read_excel(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier Excel : {}".format(e))
+            elif file.name.endswith('.csv'):
+                try:
+                    # Utiliser pandas pour lire les données du fichier CSV
+                    donnees = pd.read_csv(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier CSV : {}".format(e))
+            else:
+                return HttpResponse("Le fichier doit être au format Excel ou CSV.")
             
+            # Connexion à la base de données MySQL
             try:
-                # Convertir le contenu décodé en un objet StringIO
-                csv_data = StringIO(decoded_file)
-                # Utiliser pandas pour lire les données CSV
-                donnees_csv = pd.read_csv(csv_data)
-                
                 connection = mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -1023,7 +1063,7 @@ def insert_tmp_drh(request):
                 )
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
-                    inserer_data_tmp_drh(connection, donnees_csv)
+                    inserer_data_tmp_drh(connection, donnees)
                     connection.close()
                     print("Connexion à la base de données MySQL fermée.")
             except mysql.connector.Error as e:
@@ -1038,7 +1078,11 @@ def insert_tmp_drh(request):
     return render(request, 'adtemporairefile.html', {'form': form})
 
 
-from datetime import date
+def extraire_chiffres_dans_ordre(mot):
+    chiffres = re.findall(r'\d', mot)  # Utilisation d'une expression régulière pour trouver tous les chiffres dans le mot
+    chiffres_dans_ordre = ''.join(chiffres)  # Joindre les chiffres trouvés dans l'ordre
+    return chiffres_dans_ordre
+
 
 def update_status_from_temporaireDRH():
     # Récupérer tous les enregistrements du modèle Status
@@ -1053,30 +1097,35 @@ def update_status_from_temporaireDRH():
     # Parcourir chaque enregistrement de status_records
     for status_record in status_records:
         username = status_record.username
-        commentaire = status_record.commentaire
-        status = status_record.status
-        
+        commentaire = ""
+        status = ""
+
         # Vérifier si le username existe dans le modèle TemporaireDRH
         try:
             tmp_record = TemporaireDRH.objects.get(username=username)
+            # matricule_rh = extraire_chiffres_dans_ordre(tmp_record.username)
+            # matricule_etrx = extraire_chiffres_dans_ordre(username)
+
             date_end = tmp_record.date_end
-            
-            # Comparer la date de fin avec la date actuelle
+
+            # Comparaison des matricules extraitsh
             if date_end < date.today():
                 commentaire = "Fin de contrat, à supprimer"
-                status="desabled"
+                status = "disabled"
             else:
                 commentaire = "Actif"
-                status="enabled"
+                status = "enabled"
+
         except TemporaireDRH.DoesNotExist:
             # Si le username n'existe pas dans TemporaireDRH, mettre à jour le commentaire avec "Non trouvé"
             commentaire = "À supprimer, non présent dans L'AD 2024"
-            status="X"
-        
+            status = "X"
+
         # Mettre à jour le commentaire dans l'enregistrement Status
         status_record.commentaire = commentaire
-        status_record.status=status
+        status_record.status = status
         status_record.save()
+
 
 def update_status_tmp(request):
     # Appeler la fonction pour mettre à jour les status depuis Adm

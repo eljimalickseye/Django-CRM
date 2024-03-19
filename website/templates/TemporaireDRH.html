@@ -11,40 +11,40 @@
         align-items: center;
     }
 
-    .p_item{
+    .p_item {
         border: 1px black solid;
         font-size: 12px;
         margin: 5px;
     }
 
-    .btn-size{
+    .btn-size {
         font-size: 13px;
     }
 
     .btn-custom {
-    background-color: #080808;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    text-size-adjust: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        background-color: #080808;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        text-size-adjust: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-.btn-custom:hover {
-    background-color: #a9c6e4;
-}
+    .btn-custom:hover {
+        background-color: #a9c6e4;
+    }
 </style>
 <div class="container mt-5">
     <div class="d-flex justify-content-between mb-5">
         <h2>Liste Temporaire DRH</h2>
-        
+
         <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Add+
         </button>
-     
+
     </div>
     <table id="data_table" class="table table-striped table-bordered table-sm table-hover">
         <thead class="table-dark">
@@ -58,7 +58,7 @@
             {% if tmp_all_records %}
             {% for tmp_record in tmp_all_records %}
             <tr>
-                <td><a  class="btn btn-size btn-primary  btn-sm">{{ tmp_record.id }}</a></td>
+                <td><a class="btn btn-size btn-primary  btn-sm">{{ tmp_record.id }}</a></td>
                 <td>{{ tmp_record.username }}</td>
                 <td>{{ tmp_record.date_end }}</td>
             </tr>
@@ -66,90 +66,92 @@
             {% endif %}
         </tbody>
     </table>
+</div>
+<div class="btn-nav">
+    <div class="pagination">
+        {% if tmp_records.has_previous %}
+        <a href="?page=1" class="p_item">&laquo; First </a>
+        <a href="?page={{ tmp_records.previous_page_number }}" class="p_item">Previous</a>
+        {% endif %}
+
+        <span class="current">Page {{ tmp_records.number }} of {{ tmp_records.paginator.num_pages }}</span>
+
+        {% if tmp_records.has_next %}
+        <a href="?page={{ tmp_records.next_page_number }}" class="p_item">Next</a>
+        <a href="?page={{ tmp_records.paginator.num_pages }}" class="p_item">Last &raquo;</a>
+        {% endif %}
     </div>
-    <div class="btn-nav">
-        <div class="pagination">
-            {% if tmp_records.has_previous %}
-            <a href="?page=1" class="p_item">&laquo; First </a>
-            <a href="?page={{ tmp_records.previous_page_number }}" class="p_item">Previous</a>
-            {% endif %}
-
-            <span class="current">Page {{ tmp_records.number }} of {{ tmp_records.paginator.num_pages }}</span>
-
-            {% if tmp_records.has_next %}
-            <a href="?page={{ tmp_records.next_page_number }}" class="p_item">Next</a>
-            <a href="?page={{ tmp_records.paginator.num_pages }}" class="p_item">Last &raquo;</a>
-            {% endif %}
-        </div>
     <div>
-</div>
+    </div>
 </div>
 
 
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Upload fichier des temporaires de la DRH</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-           
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Upload fichier des temporaires de la DRH</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
                 <form method="POST" enctype="multipart/form-data" action="{% url 'insert_tmp_drh'%}">
                     {% csrf_token %}
-                    <input type="file" name="csv_file" accept=".csv" required>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </form>
-                <style>
-                    .item_pos{
-                        display: flex;
-                        flex-direction: row;
-                        column-gap: 10px;
-                    }
-                </style>
-                <div id="show"  style="display: none;">
-                    <h3>Format fichier</h3>
-                    <p>username</p>
-                    <p>date_end</p>
-                </div>
-                <div class="item_pos">
-                    <div>
-                        <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats fichier</button>
+                    <input type="file" name="file" accept=".xlsx,.csv,.xls" required>
+
+                    <style>
+                        .item_pos {
+                            display: flex;
+                            flex-direction: row;
+                            column-gap: 10px;
+                            margin-top: 5px;
+                        }
+                    </style>
+                    <div id="show" style="display: none;">
+                        <h3>Format fichier</h3>
+                        <p>username</p>
+                        <p>date_end</p>
                     </div>
-                </div>
-                <script>
-                    function toggleElement() {
-                        const show = document.getElementById("show");
-                        show.style.display = (show.style.display === "none") ? "block" : "none";
-                    }
-                </script>
+                    <div class="item_pos">
+                        <div>
+                            <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats
+                                fichier</button>
+                        </div>
+                    </div>
+                    <script>
+                        function toggleElement() {
+                            const show = document.getElementById("show");
+                            show.style.display = (show.style.display === "none") ? "block" : "none";
+                        }
+                    </script>
             </div>
-       
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-          <!-- <button type="button" class="btn btn-primary">Enregistrer</button> -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  
+</div>
+
 
 {% else %}
 <div class="container mt-5 col-md-6 offset-md-3">
-<h1>Login</h1>
-<br />
-<form action="{% url 'status' %}" method="POST" class="mt-3">
-    {% csrf_token %}
-    <div class="mb-3">
-        <input type="text" class="form-control" name="username" placeholder="Username" required>
-    </div>
-    <div class="mb-3">
-        <input type="password" class="form-control" name="password" placeholder="Password" required>
-    </div>
-    <button type="submit" class="btn btn-size btn-primary ">Login</button>
-</form>
+    <h1>Login</h1>
+    <br />
+    <form action="{% url 'status' %}" method="POST" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Username" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-size btn-primary ">Login</button>
+    </form>
 </div>
 {% endif %}
 {% endblock %}

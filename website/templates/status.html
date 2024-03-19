@@ -11,31 +11,31 @@
         align-items: center;
     }
 
-    .p_item{
+    .p_item {
         border: 1px black solid;
         font-size: 12px;
         margin: 5px;
     }
 
-    .btn-size{
+    .btn-size {
         font-size: 13px;
     }
 
     .btn-custom {
-    background-color: #080808;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    text-size-adjust: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        background-color: #080808;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        text-size-adjust: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-.btn-custom:hover {
-    background-color: #a9c6e4;
-}
+    .btn-custom:hover {
+        background-color: #a9c6e4;
+    }
 </style>
 <div class="container mt-5">
     <div class="d-flex justify-content-between mb-5">
@@ -66,7 +66,7 @@
             {% if all_status_records %}
             {% for status_record in all_status_records %}
             <tr>
-                <td><a  class="btn btn-size btn-primary  btn-sm">{{ status_record.id }}</a></td>
+                <td><a class="btn btn-size btn-primary  btn-sm">{{ status_record.id }}</a></td>
                 <td>{{ status_record.username }}</td>
                 <!-- {% if status_record_to_delete and status_record.id in status_record_to_delete %}
                 <td style="color: red;">A supprimer</td>
@@ -80,108 +80,110 @@
             {% endif %}
         </tbody>
     </table>
-    </div>
-    <div class="btn-nav">
-        <div class="pagination">
-            {% if status_records.has_previous %}
-            <a href="?page=1" class="p_item">&laquo; First </a>
-            <a href="?page={{ status_records.previous_page_number }}" class="p_item">Previous</a>
-            {% endif %}
+</div>
+<div class="btn-nav">
+    <div class="pagination">
+        {% if status_records.has_previous %}
+        <a href="?page=1" class="p_item">&laquo; First </a>
+        <a href="?page={{ status_records.previous_page_number }}" class="p_item">Previous</a>
+        {% endif %}
 
-            <span class="current">Page {{ status_records.number }} of {{ status_records.paginator.num_pages }}</span>
+        <span class="current">Page {{ status_records.number }} of {{ status_records.paginator.num_pages }}</span>
 
-            {% if status_records.has_next %}
-            <a href="?page={{ status_records.next_page_number }}" class="p_item">Next</a>
-            <a href="?page={{ status_records.paginator.num_pages }}" class="p_item">Last &raquo;</a>
-            {% endif %}
-        </div>
-    <div>
-        <button id="export_status_desabled" class="btn btn-size btn-danger" >Exporter les status AD inactifs</button>
+        {% if status_records.has_next %}
+        <a href="?page={{ status_records.next_page_number }}" class="p_item">Next</a>
+        <a href="?page={{ status_records.paginator.num_pages }}" class="p_item">Last &raquo;</a>
+        {% endif %}
     </div>
     <div>
-        <button id="export_status_gnoc" class="btn btn-size btn-success" >Exporter pour GNOC</button>
+        <button id="export_status_desabled" class="btn btn-size btn-danger">Exporter les status AD inactifs</button>
     </div>
     <div>
-        <button id="export_tmp_status" class="btn btn-size btn-success" >Exporter les Temporaires</button>
+        <button id="export_status_gnoc" class="btn btn-size btn-success">Exporter pour GNOC</button>
     </div>
     <div>
-        <button id="export_status_desc" class="btn btn-size btn-success" >Exporter pour DESC</button>
+        <button id="export_tmp_status" class="btn btn-size btn-success">Exporter les Temporaires</button>
     </div>
+    <div>
+        <button id="export_status_desc" class="btn btn-size btn-success">Exporter pour DESC</button>
     </div>
+</div>
 </div>
 </div>
 
 
 <!-- Bouton pour ouvrir la modal -->
 
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Importer les fichiers avec un status</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-           
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Importer les fichiers avec un status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
                 <form method="POST" enctype="multipart/form-data" action="{% url 'insert_status' %}">
                     {% csrf_token %}
-                    <input type="file" name="csv_file" accept=".csv" required>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </form>
-                <style>
-                    /* Styles pour cacher l'élément par défaut */
-                    .item_pos {
-                        display: flex;
-                        flex-direction: row;
-                        column-gap: 10px;
-                    }
-                </style>
-                <div id="show"  style="display: none;">
-                    <h3>Format fichier</h3>
-                    <p>username</p>
-                    <p>name</p>
-                    <p>status</p>
-                </div>
-                <div class="item_pos">
-                    <div>
-                        <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats fichier</button>
-                    </div>
+                    <input type="file" name="file" accept=".xlsx,.csv,.xls" required>
 
-                <script>
-                    function toggleElement() {
-                        const show = document.getElementById("show");
-                        show.style.display = (show.style.display === "none") ? "block" : "none";
-                    }
-                </script>
+                    <style>
+                        /* Styles pour cacher l'élément par défaut */
+                        .item_pos {
+                            display: flex;
+                            flex-direction: row;
+                            column-gap: 10px;
+                            margin-top: 5px;
+                        }
+                    </style>
+                    <div id="show" style="display: none;">
+                        <h3>Format fichier</h3>
+                        <p>username</p>
+                        <p>name</p>
+                        <p>status</p>
+                    </div>
+                    <div class="item_pos">
+                        <div>
+                            <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats
+                                fichier</button>
+                        </div>
+
+                        <script>
+                            function toggleElement() {
+                                const show = document.getElementById("show");
+                                show.style.display = (show.style.display === "none") ? "block" : "none";
+                            }
+                        </script>
+                    </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
             </div>
         </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-          <!-- <button type="button" class="btn btn-primary">Enregistrer</button> -->
-        </div>
-      </div>
     </div>
-  </div>
-  
+</div>
+
 
 
 {% else %}
 <div class="container mt-5 col-md-6 offset-md-3">
-<h1>Login</h1>
-<br />
-<form action="{% url 'status' %}" method="POST" class="mt-3">
-    {% csrf_token %}
-    <div class="mb-3">
-        <input type="text" class="form-control" name="username" placeholder="Username" required>
-    </div>
-    <div class="mb-3">
-        <input type="password" class="form-control" name="password" placeholder="Password" required>
-    </div>
-    <button type="submit" class="btn btn-size btn-primary ">Login</button>
-</form>
+    <h1>Login</h1>
+    <br />
+    <form action="{% url 'status' %}" method="POST" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Username" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-size btn-primary ">Login</button>
+    </form>
 </div>
 
 {% endif %}
@@ -189,25 +191,25 @@
 <script>
 
 
-document.getElementById("export_status_desabled").addEventListener("click", function () {
-    window.location.href = "{% url 'export_status_desabled' %}";
-});
+    document.getElementById("export_status_desabled").addEventListener("click", function () {
+        window.location.href = "{% url 'export_status_desabled' %}";
+    });
 
-// document.getElementById("export_actif").addEventListener("click", function () {
-//     window.location.href = "{% url 'export_actif' %}";
-// });
+    // document.getElementById("export_actif").addEventListener("click", function () {
+    //     window.location.href = "{% url 'export_actif' %}";
+    // });
 
-document.getElementById("export_status_gnoc").addEventListener("click", function () {
-    window.location.href = "{% url 'export_status_gnoc' %}";
-});
+    document.getElementById("export_status_gnoc").addEventListener("click", function () {
+        window.location.href = "{% url 'export_status_gnoc' %}";
+    });
 
-document.getElementById("export_tmp_status").addEventListener("click", function () {
-    window.location.href = "{% url 'export_tmp_status' %}";
-});
+    document.getElementById("export_tmp_status").addEventListener("click", function () {
+        window.location.href = "{% url 'export_tmp_status' %}";
+    });
 
-document.getElementById("export_status_desc").addEventListener("click", function () {
-    window.location.href = "{% url 'export_status_desc' %}";
-});
+    document.getElementById("export_status_desc").addEventListener("click", function () {
+        window.location.href = "{% url 'export_status_desc' %}";
+    });
 
 
 </script>
