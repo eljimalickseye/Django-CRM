@@ -58,7 +58,7 @@
                 <th scope="col">ID</th>
                 <th scope="col">Utilisateur</th>
                 <!-- <th scope="col">Traitement de la Fiabilisation</th> -->
-                <th scope="col">Status</th>
+                <th scope="col">Name</th>
                 <th scope="col">Traitement de la Fiabilisation</th>
             </tr>
         </thead>
@@ -73,7 +73,7 @@
                 {% else %}
                 <td style="color: green;">A garder</td>
                 {% endif %} -->
-                <td>{{ status_record.status }}</td>
+                <td>{{ status_record.name }}</td>
                 <td>{{status_record.commentaire}}</td>
             </tr>
             {% endfor %}
@@ -142,7 +142,6 @@
                         <h3>Format fichier</h3>
                         <p>username</p>
                         <p>name</p>
-                        <p>status</p>
                     </div>
                     <div class="item_pos">
                         <div>

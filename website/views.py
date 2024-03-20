@@ -108,23 +108,22 @@ def status(request):
         all_status_records.append({
             'username': status_record.username,
             'id': status_record.id,
-            'status': status_record.status,
+            'name':status_record.name,
             'commentaire': status_record.commentaire
         })
         # Vérifier si l'enregistrement doit être supprimé
-        if status_record.status == "desabled":
-            status_record_to_delete.append(status_record.id)
+        # if status_record.status == "desabled":
+        #     status_record_to_delete.append(status_record.id)
         # if record.statuts == "active":
         #     record_to_statuts.append(record.id)
 
     context = {
         'all_status_records': all_status_records,
-        'status_record_to_delete': status_record_to_delete,
     }
     
 
     # Rendre la page d'accueil avec le contexte et les enregistrements paginés
-    return render(request, 'status.html', {**context, 'status_records': status_records})
+    return render(request, 'status.html', {**context ,'status_records': status_records})
 
 
 def adfile(request):
@@ -580,26 +579,22 @@ def insert(request):
     return render(request, 'AddFile.html', {'form': form})
 
 
-def inserer_status_data(connection, donnees_csv):
+def inserer_status_data(connection, donnees):
     cursor = connection.cursor()
     try:
-        for index, row in donnees_csv.iterrows():
+        for index, row in donnees.iterrows():
             # Vérifier si la valeur est NaN et la remplacer par None
-            if pd.isna(row['status']):
-                row['status'] = None
             
             # Affichez les valeurs pour le débogage
             print("Insertion de la ligne :", row)
             
-            cursor.execute("INSERT INTO website_adstatus (created_at, username, name, status) VALUES (%s, %s, %s, %s)",
-                           (timezone.now(), row['username'], row['name'], row['status']))
+            cursor.execute("INSERT INTO website_adstatus (created_at, username, name) VALUES (%s, %s, %s)",
+                           (timezone.now(), row['username'], row['name']))
             
-            # Récupérer la date de la dernière connexion
-            status = row['status']
             
             # Comparer la date de la dernière connexion avec la durée pour les commentaires
-            if status == "enabled":
-                comment = "A garder"
+            if row['username']:
+                comment = "MAJ non effectue"
             else:
                 comment = "A supprimer"
 
@@ -667,9 +662,14 @@ def inserer_admp_data(connection, donnees):
     cursor = connection.cursor()
     try:
         for index, row in donnees.iterrows():
-            # Insérer les données de base
-            cursor.execute("INSERT INTO  website_admpreport (created_at, username, status) VALUES (%s, %s, %s)",
-                           (timezone.now(), row['username'], row['status']))
+            username = row.get('username')
+            status = row.get('status')
+            
+            # Vérifier si les valeurs de username et status sont présentes et valides
+            if username and status == 'enabled':
+                # Insérer les données de base
+                cursor.execute("INSERT INTO website_admpreport (created_at, username, status) VALUES (%s, %s, %s)",
+                               (timezone.now(), username, status))
         
         # Commit après toutes les opérations
         connection.commit()
@@ -679,7 +679,6 @@ def inserer_admp_data(connection, donnees):
         connection.rollback()
     finally:
         cursor.close()
-        connection.close()
 
 
 def update_status_from_adm():
@@ -777,9 +776,9 @@ def export_status_desabled(request):
     # Récupérer les enregistrements à supprimer depuis la base de données SQL
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT id, username, status, commentaire 
+            SELECT id, username, name, commentaire 
             FROM website_adstatus
-            WHERE status='desabled'
+            WHERE commentaire!='A garder'
         """)
         records_sql = cursor.fetchall()
 
@@ -788,7 +787,7 @@ def export_status_desabled(request):
             unique_ids.add(record_sql[0])  # On suppose que le premier élément de chaque tuple est l'identifiant
 
     # Récupérer les enregistrements à supprimer depuis la base de données Django
-    records_to_delete = ADStatus.objects.filter(status='desabled')
+    records_to_delete = ADStatus.objects.exclude(commentaire='A garder')
 
     # Ajouter les identifiants Django à l'ensemble, en évitant les doublons
     for record_django in records_to_delete:
@@ -807,12 +806,12 @@ def export_status_desabled(request):
             # Sinon, recherchez dans les enregistrements Django
             for record_django in records_to_delete:
                 if record_django.id == record_id:  # Si l'identifiant correspond
-                    records_to_write.append([record_django.id, record_django.username, record_django.status, record_django.commentaire])
+                    records_to_write.append([record_django.id, record_django.username, record_django.name, record_django.commentaire])
                     break
 
     # Écrire les enregistrements dans le fichier CSV
     writer = csv.writer(response, delimiter=",")
-    writer.writerow(['ID', 'Username', 'Status', 'commentaire'])
+    writer.writerow(['ID', 'Username', 'Name', 'commentaire'])
     for record in records_to_write:
         writer.writerow(record)
 
@@ -828,7 +827,7 @@ def export_status_gnoc(request):
 
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT id, username, status, commentaire FROM website_adstatus WHERE username REGEXP '^[a-zA-Z]{4}[0-9]{4}$' AND status='enabled'"
+            "SELECT id, username, name, commentaire FROM website_adstatus WHERE username REGEXP '^[a-zA-Z]{4}[0-9]{4}$'"
         )
         records_sql = cursor.fetchall()
 
@@ -855,12 +854,12 @@ def export_status_gnoc(request):
             # Sinon, recherchez dans les enregistrements Django
             for record_django in records_gnoc:
                 if record_django.id == record_id:  # Si l'identifiant correspond
-                    records_to_write.append([record_django.id, record_django.username, record_django.status, record_django.commentaire])
+                    records_to_write.append([record_django.id, record_django.username, record_django.name, record_django.commentaire])
                     break
 
     # Écrire les enregistrements dans le fichier CSV
     writer = csv.writer(response, delimiter=",")
-    writer.writerow(['ID', 'Username', 'Status', 'Commentaire'])
+    writer.writerow(['ID', 'Username', 'Name', 'Commentaire'])
     for record in records_to_write:
         writer.writerow(record)
 
@@ -874,19 +873,18 @@ def export_tmp_status(request):
     # Récupérer les enregistrements à supprimer depuis la base de données SQL
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT id, username, status, commentaire FROM website_adstatus WHERE (LOWER(username) LIKE 'tmp%' OR  LOWER(username) LIKE 'ext%' OR LOWER(username) LIKE 'stg%' OR LOWER(username) LIKE 'Int%') AND status='enabled'"
+            "SELECT id, username, name, commentaire FROM website_adstatus WHERE ((LOWER(username) LIKE 'tmp%' OR  LOWER(username) LIKE 'ext%' OR LOWER(username) LIKE 'stg%' OR LOWER(username) LIKE 'Int%') and commentaire='A garder' )"
         )
         records_sql = cursor.fetchall()
 
     # Récupérer les enregistrements à supprimer depuis la base de données Django
     records_tmp = ADStatus.objects.filter(
-        status='enabled',
         username__istartswith="tmp",
     ).filter(
         username__istartswith="ext"
     ).filter(
         username__istartswith="INT"
-    )
+    ).exclude(commentaire__istartswith="A supprimer")
 
     # Créer un dictionnaire pour stocker les enregistrements avec l'identifiant comme clé
     records_dict = {}
@@ -902,7 +900,7 @@ def export_tmp_status(request):
 
     # Écrire les enregistrements dans le fichier CSV
     writer = csv.writer(response, delimiter=",")
-    writer.writerow(['ID', 'Username', 'Status', 'Commentaire'])
+    writer.writerow(['ID', 'Username', 'Name', 'Commentaire'])
     for record in records_dict.values():
         writer.writerow(record)
 
@@ -916,13 +914,12 @@ def export_status_desc(request):
     # Récupérer les enregistrements à supprimer depuis la base de données SQL
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT id, username, status, commentaire FROM website_adstatus WHERE (LOWER(username) LIKE 'pcci%' OR LOWER(username) LIKE 'stl%' OR LOWER(username) LIKE '1431%' OR LOWER(username) LIKE '1413%' OR LOWER(username) LIKE 'ksv%' OR LOWER(username) LIKE 'w2c%' OR LOWER(username) LIKE 'pop_%' OR LOWER(username) LIKE 'pdist%' OR LOWER(username) LIKE 'sitel%' OR LOWER(username) LIKE 'psup%') AND status='enabled'"
+            "SELECT id, username, name, commentaire FROM website_adstatus WHERE (LOWER(username) LIKE 'pcci%' OR LOWER(username) LIKE 'stl%' OR LOWER(username) LIKE '1431%' OR LOWER(username) LIKE '1413%' OR LOWER(username) LIKE 'ksv%' OR LOWER(username) LIKE 'w2c%' OR LOWER(username) LIKE 'pop_%' OR LOWER(username) LIKE 'pdist%' OR LOWER(username) LIKE 'sitel%' OR LOWER(username) LIKE 'psup%')"
         )
         records_sql = cursor.fetchall()
 
     # Récupérer les enregistrements à supprimer depuis la base de données Django
         records_to_delete = ADStatus.objects.filter(
-        status="enabled",
        username__istartswith="pcci",
     ).filter(
         username__istartswith="stl"
@@ -955,11 +952,11 @@ def export_status_desc(request):
     # Ajouter les enregistrements Django dans le dictionnaire en évitant les doublons
     for record_django in records_to_delete:
         if record_django.id not in records_dict:
-            records_dict[record_django.id] = [record_django.id, record_django.username, record_django.status, record_django.commentaire]
+            records_dict[record_django.id] = [record_django.id, record_django.username, record_django.name, record_django.commentaire]
 
     # Écrire les enregistrements dans le fichier CSV
     writer = csv.writer(response, delimiter=",")
-    writer.writerow(['ID', 'Username', 'Status', 'commentaire'])
+    writer.writerow(['ID', 'Username', 'Name', 'commentaire'])
     for record in records_dict.values():
         writer.writerow(record)
 
