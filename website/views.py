@@ -1095,7 +1095,7 @@ def update_status_from_temporaireDRH():
     for status_record in status_records:
         username = status_record.username
         commentaire = ""
-        status = ""
+
 
         # Vérifier si le username existe dans le modèle TemporaireDRH
         try:
@@ -1108,19 +1108,15 @@ def update_status_from_temporaireDRH():
             # Comparaison des matricules extraitsh
             if date_end < date.today():
                 commentaire = "Fin de contrat, à supprimer"
-                status = "disabled"
             else:
-                commentaire = "Actif"
-                status = "enabled"
+                commentaire = "A garder"
 
         except TemporaireDRH.DoesNotExist:
             # Si le username n'existe pas dans TemporaireDRH, mettre à jour le commentaire avec "Non trouvé"
             commentaire = "À supprimer, non présent dans L'AD 2024"
-            status = "X"
 
         # Mettre à jour le commentaire dans l'enregistrement Status
-        status_record.commentaire = commentaire
-        status_record.status = status
+        status_record.commentaire = commentaire  
         status_record.save()
 
 
