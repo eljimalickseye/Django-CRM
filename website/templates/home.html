@@ -61,7 +61,7 @@
             {% if all_records %}
             {% for record in all_records %}
             <tr>
-                <td><a href="{% url 'record' record.id %}" class="btn btn-size btn-primary  btn-sm">{{ record.id }}</a>
+                <td><a class="btn btn-size btn-primary  btn-sm">{{ record.id }}</a></td>
                 </td>
                 <td>{{ record.username }}</td>
                 {% if record_to_delete and record.id in record_to_delete %}
@@ -143,25 +143,19 @@
                         }
                     </style>
                     <div id="show" style="display: none;">
-                        <h3>Format fichier</h3>
+                        <!-- <h3>Format fichier</h3> -->
                         <p>username</p>
                         <p>first_name</p>
                         <p>last_name</p>
                         <p>last_connected</p>
-                        <p>commentaire</p>
                     </div>
                     <div class="item_pos">
                         <div>
-                            <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats
+                            <button type="button"  class="btn btn-warning" onclick="toggleElement()">Formats
                                 fichier</button>
                         </div>
                     </div>
-                    <script>
-                        function toggleElement() {
-                            const show = document.getElementById("show");
-                            show.style.display = (show.style.display === "none") ? "block" : "none";
-                        }
-                    </script>
+
             </div>
 
             <div class="modal-footer">
@@ -174,12 +168,17 @@
     </div>
 </div>
 
-
+<script>
+    function toggleElement() {
+        const show = document.getElementById("show");
+        show.style.display = (show.style.display === "none") ? "block" : "none";
+    }
+</script>
 
 
 {% else %}
 <div class="container mt-5 col-md-6 offset-md-3">
-    <h1>Login</h1>
+    <h1 style="color:white">Login</h1>
     <br />
     <form action="{% url 'home' %}" method="POST" class="mt-3">
         {% csrf_token %}

@@ -42,38 +42,38 @@ class SignUpForm(UserCreationForm):
 
 
 # Create Add Record Form
-class AddRecordForm(forms.ModelForm):
-    first_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
-        attrs={"placeholder": "First Name", "class": "form-control"}), label="")
-    last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
-        attrs={"placeholder": "Last Name", "class": "form-control"}), label="")
-    email = forms.CharField(required=True, widget=forms.widgets.TextInput(
-        attrs={"placeholder": "Email", "class": "form-control"}), label="")
+# class AddRecordForm(forms.ModelForm):
+#     first_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
+#         attrs={"placeholder": "First Name", "class": "form-control"}), label="")
+#     last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
+#         attrs={"placeholder": "Last Name", "class": "form-control"}), label="")
+#     email = forms.CharField(required=True, widget=forms.widgets.TextInput(
+#         attrs={"placeholder": "Email", "class": "form-control"}), label="")
 
-    class Meta:
-        model = Record
-        exclude = ("user",)
-
-
-class UpdateDetailsForm(forms.ModelForm):
-    excel_file = forms.FileField(
-        label='Fichier Excel', required=False)  # Ajoutez ce champ
-
-    class Meta:
-        model = Record
-        fields = '__all__'  # Ou spécifiez les champs que vous souhaitez inclure
+#     class Meta:
+#         model = Record
+#         exclude = ("user",)
 
 
-class FilterForm(forms.Form):
-    FILTER_CHOICES = [
-        ('GNOC', 'GNOC'),
-        ('DESC', 'DESC'),
-        ('tmp', 'tmp'),
-        ('per', 'per'),
-    ]
+# class UpdateDetailsForm(forms.ModelForm):
+#     excel_file = forms.FileField(
+#         label='Fichier Excel', required=False)  # Ajoutez ce champ
 
-    filter_choice = forms.ChoiceField(
-        choices=FILTER_CHOICES, label='Choose Filter')
+#     class Meta:
+#         model = Record
+#         fields = '__all__'  # Ou spécifiez les champs que vous souhaitez inclure
+
+
+# class FilterForm(forms.Form):
+#     FILTER_CHOICES = [
+#         ('GNOC', 'GNOC'),
+#         ('DESC', 'DESC'),
+#         ('tmp', 'tmp'),
+#         ('per', 'per'),
+#     ]
+
+#     filter_choice = forms.ChoiceField(
+#         choices=FILTER_CHOICES, label='Choose Filter')
 
 
 class UploadCSVForm(forms.Form):

@@ -1,5 +1,0 @@
-body {
-    background-image: url('images/bg.jpeg');
-    background-size: cover; /* Ajuste la taille de l'image pour remplir toute la zone */
-    background-repeat: no-repeat; /* Empêche la répétition de l'image */
-}

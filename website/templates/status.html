@@ -99,6 +99,9 @@
         <button id="export_status_desabled" class="btn btn-size btn-danger">Exporter les status AD inactifs</button>
     </div>
     <div>
+        <button id="export_status_actif" class="btn btn-size btn-success">Exporter les status actifs</button>
+    </div>
+    <div>
         <button id="export_status_gnoc" class="btn btn-size btn-success">Exporter pour GNOC</button>
     </div>
     <div>
@@ -145,7 +148,7 @@
                     </div>
                     <div class="item_pos">
                         <div>
-                            <button type="submit" class="btn btn-warning" onclick="toggleElement()">Formats
+                            <button type="button" class="btn btn-warning" onclick="toggleElement()">Formats
                                 fichier</button>
                         </div>
 
@@ -194,9 +197,9 @@
         window.location.href = "{% url 'export_status_desabled' %}";
     });
 
-    // document.getElementById("export_actif").addEventListener("click", function () {
-    //     window.location.href = "{% url 'export_actif' %}";
-    // });
+    document.getElementById("export_status_actif").addEventListener("click", function () {
+        window.location.href = "{% url 'export_status_actif' %}";
+    });
 
     document.getElementById("export_status_gnoc").addEventListener("click", function () {
         window.location.href = "{% url 'export_status_gnoc' %}";

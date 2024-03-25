@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, UpdateDetailsForm, FilterForm, UploadTmpDRHForm
+from .forms import SignUpForm,UploadTmpDRHForm
 from .models import Record, ADStatus, AdMPReport, TemporaireDRH
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
@@ -13,9 +13,7 @@ import csv
 from django.db import connection
 import mysql.connector
 import pandas as pd
-from io import TextIOWrapper
 from .forms import UploadCSVForm,UploadStatusForm,UploadADForm
-from io import StringIO
 from dateutil.relativedelta import relativedelta
 import re
 from django.utils import timezone
@@ -33,7 +31,7 @@ def home(request):
     records = Record.objects.all()
 
     # Pagination
-    paginator = Paginator(records, 8)  # 10 enregistrements par page
+    paginator = Paginator(records, 100)  # 10 enregistrements par page
     page_number = request.GET.get('page')
     try:
         records = paginator.page(page_number)
@@ -84,13 +82,27 @@ def home(request):
     # Rendre la page d'accueil avec le contexte et les enregistrements paginés
     return render(request, 'home.html', {**context, 'records': records})
 
+# Connection a la base de donnees
+def connect_to_database():
+    connection = mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="admin",
+                    database="fiabliz"
+                )
+    return connection
+
+
+def welcome(request):
+    return render(request, 'welcome.html')
+
 
 def status(request):
     # Récupérer tous les enregistrements
     status_records = ADStatus.objects.all()
 
     # Pagination
-    paginator = Paginator(status_records, 8)  # 10 enregistrements par page
+    paginator = Paginator(status_records, 100)  # 10 enregistrements par page
     page_number = request.GET.get('page')
     try:
         status_records = paginator.page(page_number)
@@ -131,7 +143,7 @@ def adfile(request):
     ad_records =AdMPReport.objects.all()
 
     # Pagination
-    paginator = Paginator(ad_records, 8)  # 10 enregistrements par page
+    paginator = Paginator(ad_records, 100)  # 10 enregistrements par page
     page_number = request.GET.get('page')
     try:
         ad_records = paginator.page(page_number)
@@ -194,7 +206,7 @@ def register_user(request):
     return render(request, 'register.html', {'form': form})
 
 
-def customer_record(request, pk):
+# def customer_record(request, pk):
     if request.user.is_authenticated:
         customer_record = Record.objects.get(id=pk)
         return render(request, 'record.html', {'customer_record': customer_record})
@@ -203,7 +215,7 @@ def customer_record(request, pk):
         return redirect(home)
 
 
-def delete_record(request, pk):
+# def delete_record(request, pk):
     if request.user.is_authenticated:
         delete_it = Record.objects.get(id=pk)
         delete_it.delete()
@@ -214,7 +226,7 @@ def delete_record(request, pk):
         return redirect('home')
 
 
-def add_record(request):
+# def add_record(request):
     form = AddRecordForm(request.POST or None)
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -228,7 +240,7 @@ def add_record(request):
         return redirect('home')
 
 
-def update_record(request, pk):
+# def update_record(request, pk):
     if request.user.is_authenticated:
         current_record = Record.objects.get(id=pk)
         form = AddRecordForm(request.POST or None, instance=current_record)
@@ -242,7 +254,7 @@ def update_record(request, pk):
         return redirect('home')
 
 
-def update_details(request):
+# def update_details(request):
     message = ''
 
     if request.method == 'POST':
@@ -556,12 +568,9 @@ def insert(request):
             
             # Connexion à la base de données MySQL
             try:
-                connection = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="admin",
-                    database="fiabliz"
-                )
+
+                connection = connect_to_database()
+
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
                     inserer_donnees(connection, donnees)
@@ -635,12 +644,9 @@ def insert_status(request):
             
             # Connexion à la base de données MySQL
             try:
-                connection = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="admin",
-                    database="fiabliz"
-                )
+
+                connection = connect_to_database()
+
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
                     inserer_status_data(connection, donnees)
@@ -742,12 +748,9 @@ def insert_admp(request):
             
             # Connexion à la base de données MySQL
             try:
-                connection = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="admin",
-                    database="fiabliz"
-                )
+
+                connection = connect_to_database()
+
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
                     inserer_admp_data(connection, donnees)
@@ -969,7 +972,7 @@ def temporaire_drh(request):
     tmp_records = TemporaireDRH.objects.all()
 
     # Pagination
-    paginator = Paginator(tmp_records, 8)  # 10 enregistrements par page
+    paginator = Paginator(tmp_records, 100)  # 10 enregistrements par page
     page_number = request.GET.get('page')
     try:
         tmp_records = paginator.page(page_number)
@@ -1052,12 +1055,9 @@ def insert_tmp_drh(request):
             
             # Connexion à la base de données MySQL
             try:
-                connection = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="admin",
-                    database="fiabliz"
-                )
+
+                connection = connect_to_database()
+
                 if connection.is_connected():
                     print("Connexion à la base de données MySQL réussie.")
                     inserer_data_tmp_drh(connection, donnees)
@@ -1152,4 +1152,22 @@ def supprimer_toutes_donnees(request):
     ADStatus.objects.all().delete()
     TemporaireDRH.objects.all().delete()
     # Rediriger vers une page de confirmation ou une autre page de votre choix
-    return redirect('home')
+    return redirect('welcome')
+
+
+def export_status_actif(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="records_to_statuts_actifs.csv"'
+
+    # Récupérer les enregistrements actifs depuis la base de données Django
+    records_actifs = ADStatus.objects.filter(commentaire='A garder').values_list('id', 'username', 'name', 'commentaire')
+
+    # Écrire les enregistrements dans le fichier CSV
+    writer = csv.writer(response, delimiter=",")
+    writer.writerow(['ID', 'Username', 'Name', 'Commentaire'])
+
+    for record in records_actifs:
+        writer.writerow(record)
+
+    return response
+
