@@ -50,13 +50,12 @@ def home(request):
             'username': record.username,
             'id': record.id,
             'last_connected': record.last_connected.strftime('%Y-%m-%d'),
-            'commentaire': record.commentaire
+            'commentaire': record.commentaire,
+            'traitement': record.traitement
         })
         # Vérifier si l'enregistrement doit être supprimé
         if record.last_connected < three_months_ago:
             record_to_delete.append(record.id)
-        # if record.statuts == "active":
-        #     record_to_statuts.append(record.id)
 
     context = {
         'three_months_ago': three_months_ago,
@@ -123,11 +122,7 @@ def status(request):
             'name':status_record.name,
             'commentaire': status_record.commentaire
         })
-        # Vérifier si l'enregistrement doit être supprimé
-        # if status_record.status == "desabled":
-        #     status_record_to_delete.append(status_record.id)
-        # if record.statuts == "active":
-        #     record_to_statuts.append(record.id)
+ 
 
     context = {
         'all_status_records': all_status_records,
@@ -520,7 +515,7 @@ def inserer_donnees(connection, donnees_csv):
             last_connected = parser.parse(row['last_connected'])
             
             # Définir la durée pour les commentaires en fonction du username
-            if re.match(f"^{row['last_name']}[0-9]{{4,}}$", row['username']):
+            if re.match(f"^{row['last_name']}[0-9]{{4,}}$".lower(), row['username'].lower()):
                 comment_interval = relativedelta(months=3)  # 3 mois pour les utilisateurs internes
             else:
                 comment_interval = relativedelta(months=1)  # 1 mois par défaut
@@ -528,11 +523,14 @@ def inserer_donnees(connection, donnees_csv):
             # Comparer la date de la dernière connexion avec la durée pour les commentaires
             if last_connected < datetime.now() - comment_interval:
                 comment = "Utilisateur inactif depuis plus de {} mois".format(comment_interval.months)
+                setTraitement = "A supprimer"
             else:
                 comment = "Utilisateur actif"
+                setTraitement = "A garder"
+
 
             # Mettre à jour le commentaire dans la base de données
-            cursor.execute("UPDATE website_record SET commentaire = %s WHERE username = %s", (comment, row['username']))
+            cursor.execute("UPDATE website_record SET commentaire = %s, traitement = %s WHERE username = %s", (comment, setTraitement, row['username']))
         
         # Commit après toutes les opérations
         connection.commit()
@@ -1154,6 +1152,30 @@ def supprimer_toutes_donnees(request):
     # Rediriger vers une page de confirmation ou une autre page de votre choix
     return redirect('welcome')
 
+def supprimer_record_data(request):
+    # Supprimer toutes les données de votre modèle
+    Record.objects.all().delete()
+
+    return redirect('home')
+
+def supprimer_tmp_data(request):
+    # Supprimer toutes les données de votre modèle
+    TemporaireDRH.objects.all().delete()
+
+    return redirect('temporaire_drh')
+
+def supprimer_status_data(request):
+    # Supprimer toutes les données de votre modèle
+    ADStatus.objects.all().delete()
+
+    return redirect('status')
+
+def supprimer_ad_data(request):
+    # Supprimer toutes les données de votre modèle
+    AdMPReport.objects.all().delete()
+
+    return redirect('adfile')
+
 
 def export_status_actif(request):
     response = HttpResponse(content_type='text/csv')
@@ -1170,4 +1192,3 @@ def export_status_actif(request):
         writer.writerow(record)
 
     return response
-

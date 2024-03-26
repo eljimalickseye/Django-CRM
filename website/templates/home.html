@@ -42,9 +42,15 @@
     <div class="d-flex justify-content-between mb-5">
         <h2>Fiabilisation Des Acces</h2>
 
+        <div class="d-flex justify-content-between align-items-center">
+        <a class="nav-link" href="#" onclick="return confirm('Es-tu sûr de vouloir supprimer toutes les données ?') ? window.location.href='{% url 'supprimer_record_data' %}' : false;">
+            <i class="fas fa-trash" style="color:rgb(220, 66, 66);font-size: 24px;"></i>
+        </a>
+        <div style="margin-right: 30px;">   </div>
         <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Add+
+            <i class="fas fa-plus" ></i> Ajouter
         </button>
+    </div>
 
     </div>
     <table id="data_table" class="table table-striped table-bordered table-sm table-hover">
@@ -64,11 +70,8 @@
                 <td><a class="btn btn-size btn-primary  btn-sm">{{ record.id }}</a></td>
                 </td>
                 <td>{{ record.username }}</td>
-                {% if record_to_delete and record.id in record_to_delete %}
-                <td style="color: red;">A supprimer</td>
-                {% else %}
-                <td style="color: green;">A garder</td>
-                {% endif %}
+               
+                <td>{{ record.traitement }}</td>
                 <td>{{ record.last_connected }}</td>
                 <td>{{record.commentaire}}</td>
             </tr>
@@ -79,41 +82,41 @@
     <div class="btn-nav">
         <div class="pagination">
             {% if records.has_previous %}
-            <a href="?page=1" class="p_item">&laquo; First </a>
-            <a href="?page={{ records.previous_page_number }}" class="p_item">Previous</a>
+            <a href="?page=1" class="p_item"><i class="fas fa-angle-double-left"></i> First </a>
+            <a href="?page={{ records.previous_page_number }}" class="p_item"><i class="fas fa-chevron-left"></i> Previous</a>
             {% endif %}
 
             <span class="current">Page {{ records.number }} of {{ records.paginator.num_pages }}</span>
 
             {% if records.has_next %}
-            <a href="?page={{ records.next_page_number }}" class="p_item">Next</a>
-            <a href="?page={{ records.paginator.num_pages }}" class="p_item">Last &raquo;</a>
+            <a href="?page={{ records.next_page_number }}" class="p_item"><i class="fas fa-chevron-right"></i> Next</a>
+            <a href="?page={{ records.paginator.num_pages }}" class="p_item"><i class="fas fa-angle-double-right"></i> Last</a>
             {% endif %}
         </div>
 
         <div>
-            <button id="export" class="btn btn-size btn-danger">Exporter les enregistrements à supprimer</button>
+            <button id="export" class="btn btn-size btn-danger"><i class="fas fa-trash"></i> Ressources A Supprimer</button>
         </div>
 
 
         <div>
-            <button id="export_actif" class="btn btn-size btn-success ">Exporter les Actifs</button>
+            <button id="export_actif" class="btn btn-size btn-success "><i class="fas fa-file-csv"></i> Ressources Actifs</button>
         </div>
 
         <div>
-            <button id="export_to_gnoc" class="btn btn-size btn-success ">Exporter GNOC</button>
+            <button id="export_to_gnoc" class="btn btn-size btn-success "><i class="fas fa-file-csv"></i> GNOC</button>
         </div>
 
         <div>
-            <button id="export_tmp" class="btn btn-size btn-success ">Exporter Temporaire</button>
+            <button id="export_tmp" class="btn btn-size btn-success "><i class="fas fa-file-csv"></i> Temporaire</button>
         </div>
 
         <div>
-            <button id="export_to_desk" class="btn btn-size btn-success ">Exporter DESC</button>
+            <button id="export_to_desk" class="btn btn-size btn-success "><i class="fas fa-file-csv"></i> DESC</button>
         </div>
 
         <div>
-            <button id="export_button" class="btn btn-size btn-success ">Exporter CSV</button>
+            <button id="export_button" class="btn btn-size btn-success "><i class="fas fa-file-csv"></i> CSV</button>
         </div>
     </div>
 </div>

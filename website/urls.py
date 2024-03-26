@@ -40,4 +40,8 @@ urlpatterns = [
 
     
     path('supprimer_toutes_donnees/', views.supprimer_toutes_donnees, name='supprimer_toutes_donnees'),
+    path('supprimer_record_data/', views.supprimer_record_data, name='supprimer_record_data'),
+    path('supprimer_tmp_data/', views.supprimer_tmp_data, name='supprimer_tmp_data'),
+    path('supprimer_status_data/', views.supprimer_status_data, name='supprimer_status_data'),
+    path('supprimer_ad_data/', views.supprimer_ad_data, name='supprimer_ad_data'),
 ]

@@ -5,7 +5,8 @@
 </style>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'welcome' %}">Fiabilisation</a>
+        <a class="navbar-brand" href="{% url 'welcome' %}"><i class="fas fa-home"></i> Accueil
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -14,30 +15,30 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Date Fiab'</a>
+                    <a class="nav-link" href="{% url 'home' %}"><i class="far fa-calendar-alt"></i> Date Fiabilisation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'status' %}">Status Fiabilisation</a>
+                    <a class="nav-link" href="{% url 'status' %}"><i class="far fa-check-circle" style="color: rgb(34, 88, 34);"></i> Status Fiabilisation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'adfile' %}">Full Account AD </a>
+                     <a class="nav-link" href="{% url 'adfile' %}"><i class="fas fa-user" style="color: rgb(18, 43, 152);"></i> Full Account AD </a>
                 </li>
 
                 <a class="nav-link" href="{% url 'temporaire_drh' %}">
-                    Liste DRH
+                    <i class="far fa-list-alt"></i> Liste DRH
                 </a>
         
 
                 <a class="nav-link" href="#" onclick="return confirm('Es-tu sûr de vouloir supprimer toutes les données ?') ? window.location.href='{% url 'supprimer_toutes_donnees' %}' : false;">
-                    Supprimer les données
+                    <i class="fas fa-trash" style="color:rgb(164, 109, 109);"></i> Supprimer
                 </a>
 
                 <li class="nav-item">
-                    <a class="nav-link exit" href="{% url 'logout' %}">Déconnexion sécurisée</a>
+                    <a class="nav-link exit" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Connexion sécurisée</a>
+                    <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-sign-in-alt"></i> Connexion</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'register' %}">Nouvel utilisateur</a>

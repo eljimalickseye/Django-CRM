@@ -1,7 +1,88 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<div>
-    <h1>Hello World !</h1>
-</div>
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accueil - Votre App de Fiabilisation</title>
+  <!-- Inclure les fichiers CSS de Bootstrap -->
+  <link href="{% static 'css/boots.css'%}" rel="stylesheet">
+  <style>
+    /* Ajoutez vos styles personnalisés ici */
+    body {
+      background-image: url('{% static "images/bg.jpg" %}');
+      background-size: cover;
+      /* Ajuste la taille de l'image pour remplir toute la zone */
+      background-repeat: no-repeat;
+      /* Empêche la répétition de l'image */
+      color: rgb(219, 136, 136);
+      text-shadow: 1px 0px 0px grey;
+    }
+
+    .feature {
+      text-align: center;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .feature.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="jumbotron mt-5 bg-dark">
+      <h1 class="display-4">Bienvenue sur Votre App de Fiabilisation</h1>
+      <p class="lead">Une solution avancée pour garantir la fiabilité de vos données.</p>
+      <hr class="my-4">
+      <p>Cette application vous permet de...</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 feature">
+        <i class="fa fa-lock fa-3x mb-3"></i>
+        <h3>Sécurité</h3>
+        <p>Vos données sont sécurisées avec les dernières technologies de chiffrement.</p>
+      </div>
+      <div class="col-md-4 feature">
+        <i class="fa fa-cogs fa-3x mb-3"></i>
+        <h3>Fonctionnalités avancées</h3>
+        <p>Accédez à une gamme complète de fonctionnalités pour gérer vos données efficacement.</p>
+      </div>
+      <div class="col-md-4 feature">
+        <i class="fa fa-check-circle fa-3x mb-3"></i>
+        <h3>Fiabilité</h3>
+        <p>Notre application garantit la fiabilité de vos données à chaque étape.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inclure les fichiers JavaScript de Bootstrap (jQuery requis) -->
+  <script src="{% static 'jquery/slim.min.js' %}"></script>
+  <script src="{% static 'jquery/popper.min.js' %}"></script>
+  <script src="{% static 'jquery/boots.min.js' %}"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('.feature').each(function (i) {
+        setTimeout(function () {
+          $('.feature').eq(i).addClass('fade-in');
+        }, 200 * i);
+      });
+    });
+  </script>
+</body>
+
+</html>
+
+
+
 {% endblock %}

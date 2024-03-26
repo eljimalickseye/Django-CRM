@@ -64,16 +64,16 @@ class SignUpForm(UserCreationForm):
 #         fields = '__all__'  # Ou spécifiez les champs que vous souhaitez inclure
 
 
-# class FilterForm(forms.Form):
-#     FILTER_CHOICES = [
-#         ('GNOC', 'GNOC'),
-#         ('DESC', 'DESC'),
-#         ('tmp', 'tmp'),
-#         ('per', 'per'),
-#     ]
+class FilterForm(forms.Form):
+    FILTER_CHOICES = [
+        ('GNOC', 'GNOC'),
+        ('DESC', 'DESC'),
+        ('tmp', 'tmp'),
+        ('per', 'per'),
+    ]
 
-#     filter_choice = forms.ChoiceField(
-#         choices=FILTER_CHOICES, label='Choose Filter')
+    filter_choice = forms.ChoiceField(
+        choices=FILTER_CHOICES, label='Choose Filter')
 
 
 class UploadCSVForm(forms.Form):

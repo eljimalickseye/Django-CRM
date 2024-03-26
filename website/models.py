@@ -8,6 +8,7 @@ class Record(models.Model):
     last_name = models.CharField(max_length=50)
     last_connected = models.DateField(null=True, blank=True)
     commentaire = models.CharField(max_length=200, null=True)
+    traitement = models.CharField(max_length=200, null=True)
 
     class Meta:
         # Ajouter des contraintes ou des index si nécessaire
