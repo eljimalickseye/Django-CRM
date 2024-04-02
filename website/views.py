@@ -84,10 +84,10 @@ def home(request):
 # Connection a la base de donnees
 def connect_to_database():
     connection = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="admin",
-                    database="fiabliz"
+                    host="",
+                    user="",
+                    password="",
+                    database=""
                 )
     return connection
 
@@ -199,95 +199,6 @@ def register_user(request):
         return render(request, 'register.html', {'form': form})
 
     return render(request, 'register.html', {'form': form})
-
-
-# def customer_record(request, pk):
-    if request.user.is_authenticated:
-        customer_record = Record.objects.get(id=pk)
-        return render(request, 'record.html', {'customer_record': customer_record})
-    else:
-        messages.success(request, "You Must Be Logged In To View That Page...")
-        return redirect(home)
-
-
-# def delete_record(request, pk):
-    if request.user.is_authenticated:
-        delete_it = Record.objects.get(id=pk)
-        delete_it.delete()
-        messages.success(request, "Record Deleted Successfully...")
-        return redirect('home')
-    else:
-        messages.success(request, "You Must Be Logged In To Do That...")
-        return redirect('home')
-
-
-# def add_record(request):
-    form = AddRecordForm(request.POST or None)
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            if form.is_valid():
-                add_record = form.save()
-                messages.success(request, "Record Added...")
-                return redirect('home')
-        return render(request, 'add_record.html', {'form': form})
-    else:
-        messages.success(request, "You Must Be Logged In...")
-        return redirect('home')
-
-
-# def update_record(request, pk):
-    if request.user.is_authenticated:
-        current_record = Record.objects.get(id=pk)
-        form = AddRecordForm(request.POST or None, instance=current_record)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Record Has Been Updated!")
-            return redirect('home')
-        return render(request, 'update_record.html', {'form': form})
-    else:
-        messages.success(request, "You Must Be Logged In...")
-        return redirect('home')
-
-
-# def update_details(request):
-    message = ''
-
-    if request.method == 'POST':
-        form = UpdateDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            excel_file = request.FILES['excel_file']
-
-            # Créez un fichier temporaire pour stocker le contenu du fichier Excel
-            fd, tmp = tempfile.mkstemp()
-            with os.fdopen(fd, 'w') as out:
-                out.write(excel_file.read())
-
-            # Ouvrez le fichier Excel avec xlrd
-            book = xlrd.open_workbook(tmp)
-            sh = book.sheet_by_index(0)
-
-            # Parcourez les lignes du fichier Excel et enregistrez les données dans votre modèle
-            for rx in range(1, sh.nrows):
-                obj = Record(
-                    user_id=str(sh.row(rx)[0].value),
-                    created_at=str(sh.row(rx)[1].value),
-                    username=str(sh.row(rx)[2].value),
-                    first_name=str(sh.row(rx)[3].value),
-                    last_name=str(sh.row(rx)[4].value),
-                    last_connected=str(sh.row(rx)[5].value),
-                    # Ajoutez d'autres champs selon votre modèle
-                )
-                obj.save()
-
-            os.unlink(tmp)  # Supprimez le fichier temporaire
-
-            message = 'Données importées avec succès !'
-        else:
-            message = 'Entrées invalides'
-    else:
-        form = UpdateDetailsForm()
-
-    return render(request, 'update_details.html', {'form': form, 'message': message})
 
 
 def export_to_csv(request):
@@ -692,22 +603,21 @@ def update_status_from_adm():
     for status_record in status_records:
         username = status_record.username
         commentaire = status_record.commentaire
+        last_4_characters = username[-4:]
         
         # Vérifier si le username existe dans le modèle Adm
         try:
-            ad_record = AdMPReport.objects.get(username=username)
+            ad_record = AdMPReport.objects.get(username__endswith=last_4_characters)
             status = ad_record.status
             if status=='desabled':
                 commentaire="A supprimer"
             else:
                 commentaire="A garder"
         except AdMPReport.DoesNotExist:
-            # Si le username n'existe pas dans Adm, mettre à jour status avec "not found"
-            status ="X"
+            # Si le username n'existe pas dans Adm, mettre à jour status avec "not found" 6 
             commentaire="A supprimer, non présent dans l'AD"
         
         # Mettre à jour l'enregistrement Status avec la valeur de status récupérée
-        status_record.status = status
         status_record.commentaire = commentaire
         status_record.save()
 
