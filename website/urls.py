@@ -7,6 +7,7 @@ urlpatterns = [
     path('status/', views.status, name='status'),
     path('adfile/', views.adfile, name='adfile'),
     path('temporaire_drh/', views.temporaire_drh, name='temporaire_drh'),
+    path('extraction_nac/', views.extraction_nac, name='extraction_nac'),
 
     path('logout/', views.logout_user, name='logout'),
     path('register/', views.register_user, name='register'),
@@ -30,18 +31,26 @@ urlpatterns = [
     path('export_status_desc/', views.export_status_desc, name='export_status_desc'),
     path('export_status_actif/', views.export_status_actif, name='export_status_actif'),
 
+    path('extraction_nac/', views.extraction_nac, name='extraction_nac'),
+    path('export_nac_disabled/', views.export_nac_disabled, name='export_nac_disabled'),
+    path('export_nac_actif/', views.export_nac_actif, name='export_nac_actif'),
+
     path('insert/', views.insert, name='insert'),
     path('insert_status/', views.insert_status, name='insert_status'),
     path('insert_admp/', views.insert_admp, name='insert_admp'),
     path('insert_tmp_drh/', views.insert_tmp_drh, name='insert_tmp_drh'),
+    path('insert_extract_nac/', views.insert_extract_nac, name='insert_extract_nac'),
+
+    path('update_nac_from_adm/', views.update_nac_from_adm, name='update_nac_from_adm'),
 
     path('update_status/', views.update_status, name='update_status'),
     path('update_status_tmp/', views.update_status_tmp, name='update_status_tmp'),
-
+    path('update_nac/', views.update_nac, name='update_nac'),
     
     path('supprimer_toutes_donnees/', views.supprimer_toutes_donnees, name='supprimer_toutes_donnees'),
     path('supprimer_record_data/', views.supprimer_record_data, name='supprimer_record_data'),
     path('supprimer_tmp_data/', views.supprimer_tmp_data, name='supprimer_tmp_data'),
     path('supprimer_status_data/', views.supprimer_status_data, name='supprimer_status_data'),
     path('supprimer_ad_data/', views.supprimer_ad_data, name='supprimer_ad_data'),
+    path('supprimer_nac_data/', views.supprimer_nac_data, name='supprimer_nac_data'),
 ]

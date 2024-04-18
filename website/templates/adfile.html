@@ -56,8 +56,14 @@
         <thead class="table-dark">
             <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Utilisateur</th>
-                <th scope="col">Status</th>
+                <th scope="col">Firt Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Display Name</th>
+                <th scope="col">Sam Account Name</th>
+                <th scope="col">Email Address</th>
+                <th scope="col">Account status</th>
+                <th scope="col">Initials</th>
             </tr>
         </thead>
         <tbody>
@@ -65,8 +71,14 @@
             {% for ad_record in all_ad_records %}
             <tr>
                 <td><a class="btn btn-size btn-primary  btn-sm">{{ ad_record.id }}</a></td>
-                <td>{{ ad_record.username }}</td>
-                <td>{{ ad_record.status }}</td>
+                <td>{{ ad_record.first_name }}</td>
+                <td>{{ ad_record.last_name }}</td>
+                <td>{{ ad_record.full_name }}</td>
+                <td>{{ ad_record.display_name }}</td>
+                <td>{{ ad_record.sam_account_name }}</td>
+                <td>{{ ad_record.email_address }}</td>
+                <td>{{ ad_record.account_status }}</td>
+                <td>{{ ad_record.initials }}</td>
             </tr>
             {% endfor %}
             {% endif %}
@@ -121,8 +133,15 @@
                     </style>
                     <div id="show" style="display: none;">
                         <h3>Format fichier</h3>
-                        <p>username</p>
-                        <p>status</p>
+                        <p>ID</p>
+                        <p>Firt Name</p>
+                        <p>Last Name</p>
+                        <p>Full Name</p>
+                        <p>Display Name</p>
+                        <p>Sam Account Name</p>
+                        <p>Email Address</p>
+                        <p>Account status</p>
+                        <p>Initials</p>
                     </div>
                     <div class="item_pos">
                         <div>

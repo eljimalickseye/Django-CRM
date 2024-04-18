@@ -1,9 +1,14 @@
+from fuzzywuzzy import fuzz
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm,UploadTmpDRHForm
-from .models import Record, ADStatus, AdMPReport, TemporaireDRH
+
+
+from .models import Record, ADStatus, AdMPReport, TemporaireDRH, Extraction_nac
+from django.contrib.auth.decorators import login_required 
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
 import tempfile
@@ -19,6 +24,7 @@ import re
 from django.utils import timezone
 from dateutil import parser
 from datetime import date
+from django.db import transaction
 
 def home(request):
     now = datetime.now().date()
@@ -84,10 +90,10 @@ def home(request):
 # Connection a la base de donnees
 def connect_to_database():
     connection = mysql.connector.connect(
-                    host="",
-                    user="",
-                    password="",
-                    database=""
+                    host="localhost",
+                    user="root",
+                    password="admin",
+                    database="fiabliz"
                 )
     return connection
 
@@ -153,9 +159,15 @@ def adfile(request):
     all_ad_records = []
     for ad_record in ad_records:
         all_ad_records.append({
-            'username': ad_record.username,
             'id': ad_record.id,
-            'status': ad_record.status,
+            'first_name': ad_record.first_name,
+            'last_name': ad_record.last_name,
+            'full_name': ad_record.full_name,
+            'display_name': ad_record.display_name,
+            'sam_account_name': ad_record.sam_account_name,
+            'email_address': ad_record.email_address,
+            'account_status': ad_record.account_status,
+            'initials': ad_record.initials,
         })
 
     context = {
@@ -577,14 +589,20 @@ def inserer_admp_data(connection, donnees):
     cursor = connection.cursor()
     try:
         for index, row in donnees.iterrows():
-            username = row.get('username')
-            status = row.get('status')
+            first_name = row.get('first_name')
+            last_name = row.get('last_name')
+            full_name = row.get('full_name')
+            display_name = row.get('display_name')
+            sam_account_name = row.get('sam_account_name')
+            email_address = row.get('email_address')
+            account_status = row.get('account_status')
+            initials = row.get('initials')
             
             # Vérifier si les valeurs de username et status sont présentes et valides
-            if username and status == 'enabled':
+            if sam_account_name and account_status.lower() == 'enabled':
                 # Insérer les données de base
-                cursor.execute("INSERT INTO website_admpreport (created_at, username, status) VALUES (%s, %s, %s)",
-                               (timezone.now(), username, status))
+                cursor.execute("INSERT INTO website_admpreport (created_at, first_name, last_name, full_name,display_name,sam_account_name, email_address,account_status, initials) VALUES (%s,%s ,%s, %s,%s,%s ,%s, %s, %s)",
+                               (timezone.now(), first_name, last_name, full_name,display_name,sam_account_name, email_address,account_status, initials))
         
         # Commit après toutes les opérations
         connection.commit()
@@ -607,9 +625,9 @@ def update_status_from_adm():
         
         # Vérifier si le username existe dans le modèle Adm
         try:
-            ad_record = AdMPReport.objects.get(username__endswith=last_4_characters)
-            status = ad_record.status
-            if status=='desabled':
+            ad_record = AdMPReport.objects.get(sam_account_name__endswith=last_4_characters)
+            status = ad_record.account_status
+            if status=='disabled':
                 commentaire="A supprimer"
             else:
                 commentaire="A garder"
@@ -909,14 +927,15 @@ def temporaire_drh(request):
     return render(request, 'TemporaireDRH.html', {**context, 'tmp_records': tmp_records})
 
 
-def inserer_data_tmp_drh(connection, donnees_csv):
+def inserer_data_tmp_drh(connection, donnees_csv): 
     cursor = connection.cursor()
     try:
         for index, row in donnees_csv.iterrows():
+            formatted_date=row['date_end'].strftime("%Y-%m-%d")
             try:
                 # Insérer les données de base
                 cursor.execute("INSERT INTO website_temporairedrh (created_at, username, date_end) VALUES (%s, %s, %s)",
-                               (timezone.now(), row['username'], parser.parse(row['date_end']).strftime("%Y-%m-%d")))
+                               (timezone.now(), row['username'], formatted_date))
             except mysql.connector.Error as e:
                 if e.errno == 1062:  # Duplicate entry error
                     # Récupérer la dernière valeur pour le nom d'utilisateur
@@ -1102,3 +1121,232 @@ def export_status_actif(request):
         writer.writerow(record)
 
     return response
+
+
+
+# Extration Nac
+
+def extraction_nac(request):
+    # Récupérer tous les enregistrements
+    status_records = Extraction_nac.objects.all()
+
+    # Pagination
+    paginator = Paginator(status_records, 100)  # 10 enregistrements par page
+    page_number = request.GET.get('page')
+    try:
+        status_records = paginator.page(page_number)
+    except PageNotAnInteger:
+        # Si le numéro de page n'est pas un entier, afficher la première page
+        status_records = paginator.page(1)
+    except EmptyPage:
+        # Si la page est vide, afficher la dernière page
+        status_records = paginator.page(paginator.num_pages)
+
+    # Mettre en forme les enregistrements pour les inclure dans le contexte
+    all_status_records = []
+    for status_record in status_records:
+        all_status_records.append({
+            'id': status_record.id,
+            'Name': status_record.Name,
+            'Password':status_record.Password,
+            'Profile':status_record.Profile,
+            'Locale':status_record.Locale,
+            'Description':status_record.Description,
+            'UserType':status_record.UserType,
+            'PasswordUpdateDate':status_record.PasswordUpdateDate,
+            'MailAddress':status_record.MailAddress,
+            'commentaire': status_record.commentaire,
+        })
+ 
+
+    context = {
+        'all_status_records': all_status_records,
+    }
+    
+
+    # Rendre la page d'accueil avec le contexte et les enregistrements paginés
+    return render(request, 'nac_extract.html', {**context ,'status_records': status_records})
+
+
+def inserer_extract_nac_data(donnees):
+    try:
+        for index, row in donnees.iterrows():
+            # Gérer les valeurs NaN
+            row = row.where(pd.notnull(row), None)
+            
+            # Créer une nouvelle instance du modèle Extraction_nac
+            extraction = Extraction_nac(
+                created_at=timezone.now(),
+                Name=row['Name'],
+                Password=row['Password'],
+                Profile=row['Profile'],
+                Locale=row['Locale'],
+                Description=row['Description'],
+                UserType=row['UserType'],
+                PasswordUpdateDate=parser.parse(row['PasswordUpdateDate']),
+                MailAddress=row['MailAddress']
+            )
+            extraction.save()  # Enregistrer l'instance dans la base de données
+            
+            # Voir si le nom existe
+            if row['Name']:
+                comment = "MAJ non effectue"
+            else:
+                comment = "A supprimer"
+                
+            # Mettre à jour le commentaire dans l'instance du modèle
+            extraction.commentaire = comment
+            extraction.save()  # Enregistrer la mise à jour dans la base de données
+        
+        print("Données insérées avec succès.")
+    except Exception as e:
+        raise e
+
+def insert_extract_nac(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        form = UploadStatusForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            if file.name.endswith('.xls') or file.name.endswith('.xlsx'):
+                try:
+                    donnees = pd.read_excel(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier Excel : {}".format(e))
+            elif file.name.endswith('.csv'):
+                try:
+                    donnees = pd.read_csv(file)
+                except Exception as e:
+                    return HttpResponse("Erreur lors de la lecture du fichier CSV : {}".format(e))
+            else:
+                return HttpResponse("Le fichier doit être au format Excel ou CSV.")
+            
+            try:
+                with transaction.atomic():
+                    inserer_extract_nac_data(donnees)
+            except Exception as e:
+                return HttpResponse("Une erreur s'est produite lors de l'insertion des données : {}".format(e))
+            return redirect('extraction_nac')
+    else:
+        form = UploadStatusForm()
+    return render(request, 'extract_nac.html', {'form': form})
+
+
+def supprimer_nac_data(request):
+    # Supprimer toutes les données de votre modèle
+    Extraction_nac.objects.all().delete()
+
+    return redirect('extraction_nac')
+
+
+def get_unique_ids():
+    """
+    Récupère les identifiants uniques à partir de la base de données SQL.
+    Returns:
+        Un ensemble d'identifiants uniques.
+    """
+    unique_ids = set()
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id
+            FROM website_extraction_nac
+            WHERE commentaire != 'A garder'
+        """)
+        records_sql = cursor.fetchall()
+
+        for record_sql in records_sql:
+            unique_ids.add(record_sql[0])
+
+    return unique_ids
+
+def get_records_to_delete():
+    """
+    Récupère les enregistrements à supprimer depuis la base de données Django.
+    Returns:
+        QuerySet d'enregistrements à supprimer.
+    """
+    return Extraction_nac.objects.exclude(commentaire='A garder')
+
+def export_nac_disabled(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="nac_delete_profile.csv"'
+
+    unique_ids = get_unique_ids()
+    records_to_delete = get_records_to_delete()
+
+    records_to_write = []
+    for record_id in unique_ids:
+        for record_django in records_to_delete:
+            if record_django.id == record_id:
+                records_to_write.append([record_django.id, record_django.Name, record_django.Password, record_django.Profile, record_django.Locale, record_django.Description, record_django.UserType, record_django.PasswordUpdateDate, record_django.MailAddress, record_django.commentaire])
+                break
+
+    # Écrivez les enregistrements dans le fichier CSV (vous devrez implémenter cette partie)
+    writer = csv.writer(response, delimiter=",")
+    writer.writerow(['ID', 'Name', 'Password', 'Profile','Locale','Description','UserType','PasswordUpdateDate','MailAddress','commentaire'])
+    for record in records_to_write:
+        writer.writerow(record)
+
+    return response
+
+
+def export_nac_actif(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="records_nac_actifs.csv"'
+
+    # Récupérer les enregistrements actifs depuis la base de données Django
+    records_actifs = Extraction_nac.objects.filter(commentaire ='A garder').values_list('id', 'Name', 'Password', 'Profile','Locale','Description','UserType','PasswordUpdateDate','MailAddress','commentaire')
+
+    # Écrire les enregistrements dans le fichier CSV
+    writer = csv.writer(response, delimiter=",")
+    writer.writerow(['ID', 'Name', 'Password', 'Profile','Locale','Description','UserType','PasswordUpdateDate','MailAddress','commentaire'])
+    for record in records_actifs:
+        writer.writerow(record)
+
+    return response
+
+
+def update_nac_from_adm(request):
+    # Récupérer tous les enregistrements du modèle Extraction_nac
+    extraction_records = Extraction_nac.objects.all()
+
+    for extraction_record in extraction_records:
+        name = extraction_record.Name
+        highest_score = 0
+        best_match = None
+
+        # Recherche de tous les utilisateurs dans AdMPReport
+        potential_matches = AdMPReport.objects.all()
+
+        # Calcul de la similitude entre le nom et chaque nom d'utilisateur trouvé
+        for ad_record in potential_matches:
+            score = fuzz.ratio(name.lower(), ad_record.sam_account_name.lower())
+            if score > highest_score:
+                highest_score = score
+                best_match = ad_record
+
+        # Décision basée sur le score de similitude le plus élevé et le statut
+        if best_match and highest_score >= 80:
+            if best_match.account_status.lower() == 'disabled':
+                commentaire = "A supprimer"
+            else:
+                commentaire = "A garder"
+                print(best_match)
+                print(highest_score)
+        else:
+            commentaire = "A supprimer, non présent dans l'AD"
+
+        # Mise à jour de l'enregistrement avec le nouveau commentaire
+        extraction_record.commentaire = commentaire
+        extraction_record.save()
+
+def update_nac(request):
+    # Appeler la fonction pour mettre à jour les status depuis Adm
+    update_nac_from_adm(request)
+
+    # Récupérer tous les enregistrements mis à jour du modèle Status
+    updated_nac_records = Extraction_nac.objects.all()
+
+    # return render(request, 'status_update_result.html', {'updated_status_records': updated_status_records})
+    return redirect("extraction_nac")
+
